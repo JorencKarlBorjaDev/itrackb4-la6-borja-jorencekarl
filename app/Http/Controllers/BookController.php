@@ -97,7 +97,7 @@ class BookController extends Controller
     public function featured()
     {
         $books = $this->books();
-        $book = $books[1];
+        $book = collect($books)->firstWhere('id', 1);
 
         return view('books.featured', ['book' => $book]);
     }
