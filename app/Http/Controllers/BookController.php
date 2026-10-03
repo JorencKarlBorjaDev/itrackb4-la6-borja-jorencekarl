@@ -36,13 +36,38 @@ class BookController extends Controller
     
     public function create()
     {
-        //
+        return view('books.create');
     }
     
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+        'title' => 'required|max:255',
+        'author' => 'required|max:255',
+        'year' => 'required|numeric|min:1000|max:2026',
+        'genre' => 'required|in:History,Fiction',
+    ]);
+
+        $books = $this->books();
+
+    $newId = empty($books)
+        ? 1
+        : max(array_column($books, 'id')) + 1;
+
+    $books[] = [
+        'id' => $newId,
+        'title' => $validated['title'],
+        'author' => $validated['author'],
+        'year' => $validated['year'],
+        'genre' => $validated['genre'],
+    ];
+
+    $this->saveBooks($books);
+
+    return redirect()->route('books.index')
+        ->with('success', 'Book added successfully!');
     }
+    
     
     public function show(string $id)
     {
@@ -77,16 +102,19 @@ class BookController extends Controller
         return view('books.featured', ['book' => $book]);
     }
     
-    private function books()
+    private function books(){
+        $path = storage_path('app/books.json');
+
+        return json_decode(file_get_contents($path), true);
+    }
+
+    private function saveBooks(array $books)
     {
-        return [
-            1 => ['id' => 1, 'title' => 'The Civil War Awakening', 'author' => 'Adam Goodheart', 'year' => 1861, 'genre' => 'History'],
-            2 => ['id' => 2, 'title' => 'Countdown To War', 'author' => 'Richard Overy', 'year' => 1939, 'genre' => 'History'],
-            3 => ['id' => 3, 'title' => 'The War Of Souls', 'author' => 'Whitley Strieber', 'year' => 2012, 'genre' => 'Fiction'], 
-            4 => ['id' => 4, 'title' => 'The Navys War', 'author' => 'George C. Daughan', 'year' => 1812, 'genre' => 'History'],
-            5 => ['id' => 5, 'title' => 'The Year Germany Lost The War', 'author' => 'Andrew Nagorski', 'year' => 1941, 'genre' => 'History'],
-            6 => ['id' => 6, 'title' => 'War and Peace', 'author' => 'Leo Tolstoy', 'year' => 1869, 'genre' => 'Fiction'],
-        ];
+        file_put_contents(
+            storage_path('app/books.json'),
+            json_encode($books, JSON_PRETTY_PRINT)
+        );
+
     }
 }
 

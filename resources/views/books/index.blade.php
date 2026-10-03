@@ -12,6 +12,8 @@
 
             <h2 class="text-secondary small mb-4">Prepared by: Jorence Karl Borja</h2>
 
+            <a href="{{ route('books.create') }}" class="btn btn-primary mb-3">+ Add Book</a>
+
             <p class="mb-3">
                 <strong class="me-2 text-dark">Genre:</strong>
                 <a href="{{ route('books.index', ['genre' => 'History', 'year' => $year]) }}" class="btn btn-sm btn-outline-primary rounded-pill me-1">History</a>
